@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.christospaspalieris.polls_client_app.LoginActivity">
+
+    <EditText
+        android:id="@+id/editEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/editPassword"
+        android:layout_marginTop="128dp"
+        android:ems="10"
+        android:hint="Enter Email"
+        android:inputType="textEmailAddress"
+        tools:layout_editor_absoluteX="40dp"
+        tools:layout_editor_absoluteY="89dp" />
+
+    <EditText
+        android:id="@+id/editPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:ems="10"
+        android:hint="Enter Password"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/signup"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Sign Up" />
+
+    <Button
+        android:id="@+id/signin"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/signup"
+        android:layout_alignStart="@+id/signup"
+        android:layout_marginBottom="57dp"
+        android:text="Sign In" />
+
+    <!--<TextView-->
+        <!--android:id="@+id/textView"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignEnd="@+id/weather_checkBox"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_marginTop="68dp"-->
+        <!--android:text="@string/topicString"-->
+        <!--android:textSize="24sp"-->
+        <!--android:textStyle="bold" />-->
+
+    <!--<CheckBox-->
+        <!--android:id="@+id/weather_checkBox"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@+id/textView"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_marginTop="33dp"-->
+        <!--android:onClick="onTopicsSelected"-->
+        <!--android:text="Weather" />-->
+
+    <!--<CheckBox-->
+        <!--android:id="@+id/politics_checkBox"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignStart="@+id/weather_checkBox"-->
+        <!--android:layout_below="@+id/weather_checkBox"-->
+        <!--android:layout_marginTop="35dp"-->
+        <!--android:onClick="onTopicsSelected"-->
+        <!--android:text="Politics" />-->
+
+    <!--<CheckBox-->
+        <!--android:id="@+id/sports_checkBox"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignStart="@+id/politics_checkBox"-->
+        <!--android:layout_below="@+id/politics_checkBox"-->
+        <!--android:layout_marginTop="35dp"-->
+        <!--android:onClick="onTopicsSelected"-->
+        <!--android:text="Sports" />-->
+
+</RelativeLayout>

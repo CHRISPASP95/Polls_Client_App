@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_item_check_topics"
+        android:title="My Polls" />
+    <item
+        android:id="@+id/menu_item_topics"
+        android:title="@string/topicString"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_item_signout"
+        android:checkable="false"
+        android:title="@string/SignOut" />
+</menu>
