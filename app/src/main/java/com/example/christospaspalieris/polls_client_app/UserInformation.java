@@ -13,12 +13,12 @@ public class UserInformation {
     private String password;
     private String age;
     private String sex;
-    private String age_group;
+    private String level;
     private String topic;
 
 
 
-    public UserInformation(String username, String firstname, String lastname, String email, String password, String age, String sex, String topic, String age_group){
+    public UserInformation(String username, String firstname, String lastname, String email, String password, String age, String sex, String topic, String level){
         this.username = username;
         this.firstName = firstname;
         this.lastName = lastname;
@@ -27,7 +27,7 @@ public class UserInformation {
         this.age = age;
         this.sex = sex;
         this.topic = topic;
-        this.age_group = age_group;
+        this.level = level;
     }
 
 
@@ -53,7 +53,7 @@ public class UserInformation {
         return topic;
     }
 
-    public String getAge_group() {
-        return age_group;
+    public String getLevel() {
+        return level;
     }
 }

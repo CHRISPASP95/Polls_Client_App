@@ -1,9 +1,8 @@
 package com.example.christospaspalieris.polls_client_app;
 
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,27 +17,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
-
 
 public class Poll_Activity extends AppCompatActivity {
 
   DatabaseReference Poll_Ref;
   DatabaseReference Results_Poll_Ref;
-
-
-  String POLL_KEY = "", TOPIC = "";
-  int counter1 = 0, counter2 = 0, counter3 = 0;
-
-
+  String POLL_KEY = "", Level = "";
+  int counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0;
   ProgressBar data;
-
   TextView q1;
   Button Btn_Submit;
-
-  RadioButton rb1_q1, rb2_q1, rb3_q1;
+  RadioButton rb1_q1, rb2_q1, rb3_q1,rb4_q1, rb5_q1;
   RadioGroup radioGroup1;
-
   private static String TAG = "Poll_Activity";
 
 
@@ -47,39 +37,25 @@ public class Poll_Activity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_poll_);
     Poll_Ref = FirebaseDatabase.getInstance().getReference("polls");
-    Results_Poll_Ref = FirebaseDatabase.getInstance().getReference("Results");
-
-    // mysocket.connect();
-
-    // mysocket.emit("android_socket","Hello From Android App");
-
-    q1 = (TextView) findViewById(R.id.question_1);
-
+    Results_Poll_Ref = FirebaseDatabase.getInstance().getReference("Results");  q1 = (TextView) findViewById(R.id.question_1);
     Btn_Submit = (Button) findViewById(R.id.submit_result);
-
     rb1_q1 = (RadioButton) findViewById(R.id.btn1_question1);
     rb2_q1 = (RadioButton) findViewById(R.id.btn2_question1);
     rb3_q1 = (RadioButton) findViewById(R.id.btn3_question1);
+    rb4_q1 = (RadioButton) findViewById(R.id.btn4_question1);
+    rb5_q1 = (RadioButton) findViewById(R.id.btn5_question1);
     radioGroup1 = (RadioGroup) findViewById(R.id.radiogroup1);
-
     data = (ProgressBar) findViewById(R.id.test_progressbar);
 
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
-      POLL_KEY = bundle.getString("get_tapped_question");
+      POLL_KEY = bundle.getString("getTappedQuestion");
       Log.d(TAG + "POLL_KEY", POLL_KEY);
-
-      TOPIC = bundle.getString("poll_topic");
-
-      Log.d(TAG + "POLL_KEY", TOPIC);
-
-      // GetQuestion(TOPIC,POLL_KEY);
+      Level = bundle.getString("poll_level");
+      Log.d(TAG + "POLL_KEY", Level);
     }
 
-//        QuestionTopic = TOPIC;
-//        Key = POLL_KEY;
-    Poll_Ref.child(TOPIC).child(POLL_KEY).child("Question").addValueEventListener(new ValueEventListener() {
-
+    Poll_Ref.child(Level).child(POLL_KEY).child("Question").addValueEventListener(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
         q1.setText(String.valueOf(dataSnapshot.getValue()));
@@ -91,42 +67,12 @@ public class Poll_Activity extends AppCompatActivity {
       }
     });
 
-    Poll_Ref.child(TOPIC).child(POLL_KEY).child("Choices").child("Choice1").addValueEventListener(new ValueEventListener() {
+    Poll_Ref.child(Level).child(POLL_KEY).child("Choices").addValueEventListener(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
-        Log.d(TAG + "Choice1", dataSnapshot.getKey());
-        Log.d(TAG + "Choice1", String.valueOf(dataSnapshot.getValue()));
-        rb1_q1.setText(String.valueOf(dataSnapshot.getValue()));
-        // counter1 = Integer.parseInt(String.valueOf(dataSnapshot.child(rb1_q1.getText().toString()).getValue()));
-      }
-
-      @Override
-      public void onCancelled(DatabaseError databaseError) {
-
-      }
-    });
-
-    Poll_Ref.child(TOPIC).child(POLL_KEY).child("Choices").child("Choice2").addValueEventListener(new ValueEventListener() {
-      @Override
-      public void onDataChange(DataSnapshot dataSnapshot) {
-        Log.d(TAG + "Choice2", dataSnapshot.getKey());
-        rb2_q1.setText(String.valueOf(dataSnapshot.getValue()));
-        // counter2 = Integer.parseInt(String.valueOf(dataSnapshot.child(rb2_q1.getText().toString()).getValue()));
-      }
-
-      @Override
-      public void onCancelled(DatabaseError databaseError) {
-
-      }
-    });
-
-    Poll_Ref.child(TOPIC).child(POLL_KEY).child("Choices").child("Choice3").addValueEventListener(new ValueEventListener() {
-      @Override
-      public void onDataChange(DataSnapshot dataSnapshot) {
-        Log.d(TAG + "Choice3", dataSnapshot.getKey());
-        rb3_q1.setText(String.valueOf(dataSnapshot.getValue()));
-        data.setVisibility(View.GONE);
-        // counter3 = Integer.parseInt(String.valueOf(dataSnapshot.child(rb3_q1.getText().toString()).getValue()));
+       for(DataSnapshot d : dataSnapshot.getChildren()){
+         ShowQuestion(d.getKey());
+       }
       }
 
       @Override
@@ -136,34 +82,95 @@ public class Poll_Activity extends AppCompatActivity {
     });
 
 
-    Btn_Submit.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
+
+    Btn_Submit.setOnClickListener(v ->finish());
+  }
+
+  private void ShowQuestion(String key) {
+    if(key.equals("Choice1")){
+      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice1").addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+          Log.d(TAG + "Choice1", dataSnapshot.getKey());
+          Log.d(TAG + "Choice1", String.valueOf(dataSnapshot.getValue()));
+          rb1_q1.setText(String.valueOf(dataSnapshot.getValue()));
+
         }
-//        Intent intent = new Intent(getApplicationContext(),PollsTopicActivity.class);
-//        intent.putExtra("poll_topic", TOPIC);
-//        startActivity(intent);
-        finish();
-      }
-    });
 
-    Log.d("EEE", "FDSFSFSFSS");
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
 
-    //POLL_KEY = id erotisis
-    //TOPIC = thema
+        }
+      });
+    }
+    if(key.equals("Choice2")){
+      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice2").addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+          Log.d(TAG + "Choice2", dataSnapshot.getKey());
+          rb2_q1.setText(String.valueOf(dataSnapshot.getValue()));
+          data.setVisibility(View.GONE);
+          // counter2 = Integer.parseInt(String.valueOf(dataSnapshot.child(rb2_q1.getText().toString()).getValue()));
+        }
 
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
 
+        }
+      });
+    }
+    if(key.equals("Choice3")){
+      rb3_q1.setVisibility(View.VISIBLE);
+      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice3").addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+          Log.d(TAG + "Choice3", dataSnapshot.getKey());
+          rb3_q1.setText(String.valueOf(dataSnapshot.getValue()));
+
+          // counter3 = Integer.parseInt(String.valueOf(dataSnapshot.child(rb3_q1.getText().toString()).getValue()));
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+      });
+    }
+    if(key.equals("Choice4")){
+      rb4_q1.setVisibility(View.VISIBLE);
+      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice4").addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+          Log.d(TAG + "Choice4", dataSnapshot.getKey());
+          rb4_q1.setText(String.valueOf(dataSnapshot.getValue()));
+
+          // counter3 = Integer.parseInt(String.valueOf(dataSnapshot.child(rb3_q1.getText().toString()).getValue()));
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+      });
+    }
+    if(key.equals("Choice5")){
+      rb5_q1.setVisibility(View.VISIBLE);
+      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice5").addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+          Log.d(TAG + "Choice5", dataSnapshot.getKey());
+          rb5_q1.setText(String.valueOf(dataSnapshot.getValue()));
+
+          // counter3 = Integer.parseInt(String.valueOf(dataSnapshot.child(rb3_q1.getText().toString()).getValue()));
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+      });
+    }
   }
-
-  private void GetQuestion(String QuestionTopic, String Key) {
-
-
-  }
-
 
   @Override
   public void onBackPressed() {
@@ -172,119 +179,73 @@ public class Poll_Activity extends AppCompatActivity {
 
   public void RadioButtons_Selected(View view) {
     boolean checked = ((RadioButton) view).isChecked();
+    SaveResults(checked,view.getId());
+  }
 
-    switch (view.getId()) {
+  private void SaveResults(boolean checked, int id) {
+    if(id == R.id.btn1_question1 || id == R.id.btn2_question1 || id == R.id.btn3_question1 || id == R.id.btn4_question1 || id == R.id.btn5_question1)
+      Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("question").setValue(q1.getText().toString());
+
+    switch (id) {
       case R.id.btn1_question1:
         if (checked) {
+          rb1_q1.setEnabled(false);
           rb2_q1.setEnabled(false);
           rb3_q1.setEnabled(false);
+          rb4_q1.setEnabled(false);
+          rb5_q1.setEnabled(false);
           counter1++;
-          //Poll_Ref.child(POLL_KEY).child(TOPIC).child(question1_id).child("Question").child("Choice1").child(rb1_q1.getText().toString()).setValue(counter1);
-          Results_Poll_Ref.child(TOPIC).child(POLL_KEY).child("Question").child("question").setValue(q1.getText().toString());
-          Results_Poll_Ref.child(TOPIC).child(POLL_KEY).child("Question").child("answers").child("Choice1").child(rb1_q1.getText().toString()).setValue(counter1);
+          Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("answers").child("Choice1").child(rb1_q1.getText().toString()).setValue(counter1);
         }
         break;
       case R.id.btn2_question1:
         if (checked) {
           rb1_q1.setEnabled(false);
+          rb2_q1.setEnabled(false);
           rb3_q1.setEnabled(false);
+          rb4_q1.setEnabled(false);
+          rb5_q1.setEnabled(false);
           counter2++;
-          //  Poll_Ref.child(POLL_KEY).child(TOPIC).child(question1_id).child("Question").child("Choice2").child(rb2_q1.getText().toString()).setValue(counter2);
-          Results_Poll_Ref.child(TOPIC).child(POLL_KEY).child("Question").child("question").setValue(q1.getText().toString());
-          Results_Poll_Ref.child(TOPIC).child(POLL_KEY).child("Question").child("answers").child("Choice2").child(rb2_q1.getText().toString()).setValue(counter2);
+          //Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("question").setValue(q1.getText().toString());
+          Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("answers").child("Choice2").child(rb2_q1.getText().toString()).setValue(counter2);
         }
         break;
       case R.id.btn3_question1:
         if (checked) {
           rb1_q1.setEnabled(false);
           rb2_q1.setEnabled(false);
+          rb3_q1.setEnabled(false);
+          rb4_q1.setEnabled(false);
+          rb5_q1.setEnabled(false);
           counter3++;
-          //  Poll_Ref.child(POLL_KEY).child(TOPIC).child(question1_id).child("Question").child("Choice3").child(rb3_q1.getText().toString()).setValue(counter3);
-          Results_Poll_Ref.child(TOPIC).child(POLL_KEY).child("Question").child("question").setValue(q1.getText().toString());
-          Results_Poll_Ref.child(TOPIC).child(POLL_KEY).child("Question").child("answers").child("Choice3").child(rb3_q1.getText().toString()).setValue(counter3);
+          // Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("question").setValue(q1.getText().toString());
+          Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("answers").child("Choice3").child(rb3_q1.getText().toString()).setValue(counter3);
         }
         break;
-
-
+      case R.id.btn4_question1:
+        if (checked) {
+          rb1_q1.setEnabled(false);
+          rb2_q1.setEnabled(false);
+          rb3_q1.setEnabled(false);
+          rb4_q1.setEnabled(false);
+          rb5_q1.setEnabled(false);
+          counter4++;
+          //Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("question").setValue(q1.getText().toString());
+          Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("answers").child("Choice4").child(rb4_q1.getText().toString()).setValue(counter4);
+        }
+        break;
+      case R.id.btn5_question1:
+        if (checked) {
+          rb1_q1.setEnabled(false);
+          rb2_q1.setEnabled(false);
+          rb3_q1.setEnabled(false);
+          rb4_q1.setEnabled(false);
+          rb5_q1.setEnabled(false);
+          counter5++;
+          // Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("question").setValue(q1.getText().toString());
+          Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("answers").child("Choice5").child(rb5_q1.getText().toString()).setValue(counter5);
+        }
+        break;
     }
   }
-
-   /* public void Receive_Polls(final String TOPIC, final String Question_id){
-
-        final HashMap<String,String> Poll_Values = new HashMap<>();
-        //Log.d(TAG + "Question_id",Question_id);
-        //Log.d(TAG + "TOPIC",TOPIC);
-        Poll_Ref.child(POLL_KEY).child(TOPIC).addValueEventListener(new ValueEventListener() {
-            @Override   //Log.d(TAG,dataSnapshot.getKey());
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                Poll_Values.put("question", dataSnapshot.child(Question_id).child("Question").child("question").getValue().toString());
-                Poll_Values.put("choice1", dataSnapshot.child(Question_id).child("Question").child("Choices").child("choice1").getValue().toString());
-                Poll_Values.put("choice2", dataSnapshot.child(Question_id).child("Question").child("Choices").child("choice2").getValue().toString());
-                Poll_Values.put("choice3", dataSnapshot.child(Question_id).child("Question").child("Choices").child("choice3").getValue().toString());
-
-                if(Question_id.equals(question1_id)){
-                    Log.d(TAG + "question1_id",Question_id);
-                    Log.d(TAG + "question",Poll_Values.get("question"));
-
-                    Log.d(TAG + "question",Poll_Values.get("choice1"));
-                    Log.d(TAG + "question",Poll_Values.get("choice2"));
-                    Log.d(TAG + "question",Poll_Values.get("choice3"));
-
-                    q1.setText(Poll_Values.get("question"));
-                    rb1_q1.setText(Poll_Values.get("choice1"));
-                    rb2_q1.setText(Poll_Values.get("choice2"));
-                    rb3_q1.setText(Poll_Values.get("choice3"));
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }*/
-
-
 }
-
-
-//    private Socket mysocket, mysocket_Choice1, mysocket_Choice2, mysocket_Choice3;
-//    {
-//        try {
-//            mysocket = IO.socket("http://192.168.1.5:1337/");
-//           // mysocket_Choice1 = IO.socket("http://192.168.1.5:1337/");
-//           // mysocket_Choice2 = IO.socket("http://192.168.1.5:1337/");
-//         //   mysocket_Choice3 = IO.socket("http://192.168.1.5:1337/");
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-//    private Socket mysocket_Choice1;
-//    {
-//        try {
-//            mysocket_Choice1 = IO.socket("http://192.168.1.5:1337/");
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-//    private Socket mysocket_Choice2;
-//    {
-//        try {
-//            mysocket_Choice2 = IO.socket("http://192.168.1.5:1337/");
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-//    private Socket mysocket_Choice3;
-//    {
-//        try {
-//            mysocket_Choice3 = IO.socket("http://192.168.1.5:1337/");
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        }
-//    }

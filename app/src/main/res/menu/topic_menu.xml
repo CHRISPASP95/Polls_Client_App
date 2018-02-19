@@ -6,7 +6,7 @@
         android:id="@+id/menu_item_check_topics"
         android:title="My Polls" />
     <item
-        android:id="@+id/menu_item_topics"
+        android:id="@+id/menu_item_levels"
         android:title="@string/topicString"
         app:showAsAction="ifRoom" />
     <item

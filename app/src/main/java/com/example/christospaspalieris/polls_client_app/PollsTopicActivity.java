@@ -2,9 +2,8 @@ package com.example.christospaspalieris.polls_client_app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,36 +20,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import junit.framework.Test;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 
 public class PollsTopicActivity extends AppCompatActivity {
 
   static String TAG = "PollsTopicActivity";
-
-  public String user_id = "", TOPIC = "";
-
+  public String userId = "", Level = "", getUser = "", getTappedQuestion;
   private RecyclerView userQuestionsList;
-
-  DatabaseReference userpolls, pollsRef;
-
-  String get_user = "", get_tapped_question;
-
-
-  DatabaseReference dbRef;
-
-  Context mcontext;
-
+  DatabaseReference userPolls, pollsRef, dbRef;
+  Context mContext;
   PollHandler pollHandler;
-  Map<String,Object> polls_keys_Answered = new HashMap<>();
-
+  Map<String,Object> pollsKeysAnswered = new HashMap<>();
 
   @Override
   public void onBackPressed() {
@@ -71,117 +53,100 @@ public class PollsTopicActivity extends AppCompatActivity {
   protected void onResume() {
     super.onResume();
     if(dbRef!=null){
-      pollHandler.setAnsweredKeys(polls_keys_Answered);
-      dbRef.removeValue(); //!!!!!!
-     //startActivity(new Intent(getApplicationContext(),PollsTopicActivity.class));
+      pollHandler.setAnsweredKeys(pollsKeysAnswered);
+      dbRef.removeValue(); //!!!!!
     }
-
   }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_polls_topic);
-    mcontext = PollsTopicActivity.this;
-
+    mContext = PollsTopicActivity.this;
 
     if (getSupportActionBar() != null) {
       getSupportActionBar().setDisplayHomeAsUpEnabled(true);
       getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
-    user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
-      TOPIC = bundle.getString("poll_topic");
-
-
-
-      Log.d(TAG + "TOPIC", TOPIC);
-
-      pollHandler = new PollHandler(TOPIC);
-      userpolls = FirebaseDatabase.getInstance().getReference("USERS").child(user_id).child(TOPIC).child("UnAnswered");
-
+      Level = bundle.getString("poll_level");
+      Log.d(TAG + "TOPIC", Level);
+      pollHandler = new PollHandler(Level);
+      userPolls = FirebaseDatabase.getInstance().getReference("USERS").child(userId).child(Level).child("UnAnswered");
       pollsRef = FirebaseDatabase.getInstance().getReference("polls");
     }
 
     userQuestionsList = (RecyclerView) findViewById(R.id.poll_list);
     userQuestionsList.setHasFixedSize(true);
-    userQuestionsList.setLayoutManager(new LinearLayoutManager(mcontext));
+    userQuestionsList.setLayoutManager(new LinearLayoutManager(mContext));
 
-    Log.d(TAG + "USERID", user_id);
+    Log.d(TAG + "USERID", userId);
 
-    if (userpolls != null) {
-      final FirebaseRecyclerAdapter<String, QuestionViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<String, QuestionViewHolder>(
-          String.class,
-          R.layout.question_poll,
-          QuestionViewHolder.class,
-          userpolls
-      ) {
-        @Override
-        protected void populateViewHolder(final QuestionViewHolder viewHolder, final String model, int position) {
+    Runnable runnable = () -> {
 
-          get_user = getRef(position).getKey();
-         // keys_UnAswered.put(get_user,get_user);
+      if (userPolls != null) {
+        final FirebaseRecyclerAdapter<String, QuestionViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<String, QuestionViewHolder>(
+            String.class,
+            R.layout.question_poll,
+            QuestionViewHolder.class,
+            userPolls
+        ) {
+          @Override
+          protected void populateViewHolder(final QuestionViewHolder viewHolder, final String model, int position) {
+            getUser = getRef(position).getKey();
+            Log.d(TAG + "getUser", getUser);
+            Log.d(TAG + "userPolls.getRef()", String.valueOf(userPolls.getRef()));
+            pollsRef.child(Level).child(getUser).child("Question").addValueEventListener(new ValueEventListener() {
+              @Override
+              public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, String.valueOf(dataSnapshot.getRef()));
+                Log.d(TAG, String.valueOf(dataSnapshot.getValue()));
+                viewHolder.setQuestion_display(String.valueOf(dataSnapshot.getValue()));
+              }
 
+              @Override
+              public void onCancelled(DatabaseError databaseError) {
 
+              }
+            });
 
-         // Log.d(TAG + "keys_UnAswered", keys_UnAswered.toString());
-          Log.d(TAG + "get_user", get_user);
-          Log.d(TAG + "userpolls.getRef()", String.valueOf(userpolls.getRef()));
-
-          pollsRef.child(TOPIC).child(get_user).child("Question").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-              Log.d(TAG, String.valueOf(dataSnapshot.getRef()));
-              Log.d(TAG, String.valueOf(dataSnapshot.getValue()));
-              viewHolder.setQuestion_display(String.valueOf(dataSnapshot.getValue()));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-          });
-
-          viewHolder.BtnClick.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            viewHolder.BtnClick.setOnClickListener((v) -> {
               dbRef = getRef(viewHolder.getQuestionPosition());
-              get_tapped_question = dbRef.getKey();
-              polls_keys_Answered.put(get_tapped_question,get_tapped_question);
-
-
+              getTappedQuestion = dbRef.getKey();
+              pollsKeysAnswered.put(getTappedQuestion, getTappedQuestion);
               Intent poll_activity = new Intent(PollsTopicActivity.this, Poll_Activity.class);
-
-              Log.d(TAG + " get_user", String.valueOf(get_tapped_question));
+              Log.d(TAG + " getUser", String.valueOf(getTappedQuestion));
               Log.d(TAG + " From the adapter", String.valueOf(dbRef));
-              Log.d(TAG + " TOPIC", TOPIC);
-              Log.d(TAG + " get_tapped_question", String.valueOf(get_tapped_question));
-
+              Log.d(TAG + " TOPIC", Level);
+              Log.d(TAG + " getTappedQuestion", String.valueOf(getTappedQuestion));
               Bundle mBundle = new Bundle();
-              mBundle.putString("poll_topic", TOPIC);
-              mBundle.putString("get_tapped_question", get_tapped_question);
+              mBundle.putString("poll_level", Level);
+              mBundle.putString("getTappedQuestion", getTappedQuestion);
               poll_activity.putExtras(mBundle);
               poll_activity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
               startActivity(poll_activity);
-            }
-          });
-        }
-      };
+            });
+          }
+        };
 
-      firebaseRecyclerAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-        @Override
-        public void onItemRangeInserted(int positionStart, int itemCount) {
-          userQuestionsList.scrollToPosition(firebaseRecyclerAdapter.getItemCount());
-        }
-      });
+        firebaseRecyclerAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+          @Override
+          public void onItemRangeInserted(int positionStart, int itemCount) {
+            userQuestionsList.scrollToPosition(firebaseRecyclerAdapter.getItemCount());
+          }
+        });
+        userQuestionsList.setAdapter(firebaseRecyclerAdapter);
+      }
+    };
 
-      userQuestionsList.setAdapter(firebaseRecyclerAdapter);
-    }
+    Thread thread = new Thread(runnable);
+    thread.start();
 
+    thread.interrupt();
   }
 
   public static class QuestionViewHolder extends RecyclerView.ViewHolder {
@@ -194,7 +159,6 @@ public class PollsTopicActivity extends AppCompatActivity {
       super(itemView);
       question_display = (TextView) itemView.findViewById(R.id.question_display_item);
       BtnClick = (Button) itemView.findViewById(R.id.click_btn);
-
     }
 
     public void setQuestion_display(String question_text) {
@@ -206,5 +170,4 @@ public class PollsTopicActivity extends AppCompatActivity {
       return position;
     }
   }
-
 }

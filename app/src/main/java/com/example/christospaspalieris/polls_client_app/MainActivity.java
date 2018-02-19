@@ -1,21 +1,18 @@
 package com.example.christospaspalieris.polls_client_app;
 
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -25,7 +22,6 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.auth.FirebaseAuth;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,37 +35,25 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-
   private static String TAG = "MainActivity";
-  FirebaseAuth mAuth;
-  DatabaseReference user_info, results_keys_ref;
-  Dialog Topics_Dialog;
-
-  TextView no_poll;
-  TextView get_Topic;
-
-  CheckBox weather_btn, politics_btn, sports_btn;
-  LinearLayout resultsLayout;
-
-  Button btn_submit_topic, btn_next;
-
-  String user_topic = "", user_id = "";
-  String sex = "";
-  String age_group = "";
-
-  String title_result = "", id = "";
-  int results_id = 0;
-
-  PieChart results_PieChart;
-  PieDataSet set;
-  PieData data;
-  List<PieEntry> users_results;
-  List<String> result_keys;
-
+  private FirebaseAuth mAuth;
+  private DatabaseReference userInfo, resultsKeysRef;
+  private Dialog TopicsDialog;
+  private TextView noPoll;
+  private TextView getTopic;
+  private RadioButton studentBtn, juniorBtn, seniorBtn;
+  private LinearLayout resultsLayout;
+  private Button btnSubmitLevel, btnNext;
+  private String userLevel = "", userId = "", sex = "", level = "", titleResult = "", id = "";
+  private int resultsId = 0;
+  private PieChart resultsPieChart;
+  private PieDataSet set;
+  private PieData data;
+  private List<PieEntry> usersResults;
+  private List<String> resultKeys;
 
   @Override
   public void onBackPressed() {
-    // super.onBackPressed();
   }
 
   public String getTitleQuestion(String title) {
@@ -85,59 +69,49 @@ public class MainActivity extends AppCompatActivity {
     Bundle bundle = getIntent().getExtras();
     if (bundle != null)
     {
-      user_topic = bundle.getString("User_Topic");
-      results_keys_ref = FirebaseDatabase.getInstance().getReference("Results").child(user_topic);
+      userLevel = bundle.getString("User_Level");
+      resultsKeysRef = FirebaseDatabase.getInstance().getReference("Results").child(userLevel);
     }
 
+    Log.d(TAG + " userLevel", userLevel);
 
-    result_keys = new ArrayList<>();
+    resultKeys = new ArrayList<>();
     resultsLayout = (LinearLayout) findViewById(R.id.results_layout);
 
     mAuth = FirebaseAuth.getInstance();
-    user_id = mAuth.getCurrentUser().getUid();
-    get_Topic = (TextView) findViewById(R.id.display_topic);
-    no_poll = (TextView) findViewById(R.id.no_poll_available);
-    btn_next = (Button) findViewById(R.id.btn_next);
-    no_poll.setText("No Polls Available");
+    userId = mAuth.getCurrentUser().getUid();
+    getTopic = (TextView) findViewById(R.id.display_topic);
+    noPoll = (TextView) findViewById(R.id.no_poll_available);
+    btnNext = (Button) findViewById(R.id.btn_next);
+    noPoll.setText(R.string.NoPoll);
 
-    users_results = new ArrayList<>();
+    usersResults = new ArrayList<>();
+    resultsPieChart = (PieChart) findViewById(R.id.pie_graph_results);
+    userInfo = FirebaseDatabase.getInstance().getReference("USERS").child(userId);
+    userInfo.addListenerForSingleValueEvent(new ValueEventListener() {
 
-    results_PieChart = (PieChart) findViewById(R.id.pie_graph_results);
-
-    user_info = FirebaseDatabase.getInstance().getReference("USERS").child(user_id);
-
-    user_info.addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
+        if (!dataSnapshot.child(level).getValue().equals("UnAnswered"))
+          noPoll.setVisibility(View.GONE);
+
         for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
           Log.d(TAG, String.valueOf(dataSnapshot1.getValue()));
           Log.d(TAG, String.valueOf(dataSnapshot1.getKey()));
-          if (dataSnapshot1.getKey().equals("topic")) {
-            user_topic = String.valueOf(dataSnapshot1.getValue());
-            get_Topic.setText("You are subscribed  in: " + user_topic);
-            Log.d(TAG + " user_topic", user_topic);
-
-          }
-
-          if (dataSnapshot1.getValue().equals(user_topic))
-            no_poll.setVisibility(View.GONE);
-
           if (dataSnapshot1.getKey().equals("sex")) {
             sex = String.valueOf(dataSnapshot1.getValue());
             Log.d(TAG + " sex", sex);
           }
-          if (dataSnapshot1.getKey().equals("age_group")) {
-            age_group = String.valueOf(dataSnapshot1.getValue());
-            Log.d(TAG + " age_group", age_group);
+          if (dataSnapshot1.getKey().equals("level")) {
+            level = String.valueOf(dataSnapshot1.getValue());
+            Log.d(TAG + " level", level);
           }
-
-
         }
-        FirebaseMessaging.getInstance().subscribeToTopic(user_topic);
+        FirebaseMessaging.getInstance().subscribeToTopic("Informatics");
+        Log.d(TAG + " sex", sex);
         FirebaseMessaging.getInstance().subscribeToTopic(sex);
-        FirebaseMessaging.getInstance().subscribeToTopic(age_group);
-
-
+        FirebaseMessaging.getInstance().subscribeToTopic(level);
+        Log.d(TAG + " level", level);
       }
 
       @Override
@@ -146,45 +120,35 @@ public class MainActivity extends AppCompatActivity {
       }
     });
 
-    btn_next.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
+    btnNext.setOnClickListener(v -> {
 
-        Runnable runnable = new Runnable() {
-          @Override
-          public void run() {
-
-            synchronized (this) {
-
-              if (!user_topic.isEmpty()) {
-                results_id++;
-                if (results_id >= result_keys.size()) {
-                  Log.d(TAG + "results_id", String.valueOf(results_id));
-                  results_id = 0;
-                }
-                Log.d(TAG + " thread1", "Thread1 is called");
-                Show_Results(results_id);
-              }
-            }
+      Runnable runnable = ()-> {
+        if (!userLevel.isEmpty()) {
+          resultsId++;
+          if (resultsId >= resultKeys.size()) {
+            Log.d(TAG + "resultsId", String.valueOf(resultsId));
+            resultsId = 0;
           }
-        };
+          Log.d(TAG + " thread1", "Thread1 is called");
+          Show_Results(resultsId);
+        }
+      };
+      Thread thread = new Thread(runnable);
+      thread.start();
 
-        Thread thread = new Thread(runnable);
-        thread.start();
-
-      }
+      thread.interrupt();
     });
 
 
-    user_info.child("topic").addValueEventListener(new ValueEventListener() {
+    userInfo.child("level").addValueEventListener(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
-        results_id = 0;
-        get_Topic.setText("You are subscribed  in: " + user_topic);
-        results_keys_ref = FirebaseDatabase.getInstance().getReference("Results").child(user_topic);
-        Log.d(TAG + " user_topictest", user_topic);
+        resultsId = 0;
+        getTopic.setText("You are subscribed  in: " + userLevel);
+        resultsKeysRef = FirebaseDatabase.getInstance().getReference("Results").child(userLevel);
+        Log.d(TAG + " user_topictest", userLevel);
 
-        results_keys_ref.addValueEventListener(new ValueEventListener() {
+        resultsKeysRef.addValueEventListener(new ValueEventListener() {
           @Override
           public void onDataChange(DataSnapshot dataSnapshot) {
             Log.d(TAG + " layout", String.valueOf(dataSnapshot));
@@ -195,42 +159,31 @@ public class MainActivity extends AppCompatActivity {
               Log.d(TAG + " layout", "GONE");
               resultsLayout.setVisibility(View.GONE);
             }
-
-
           }
-
           @Override
           public void onCancelled(DatabaseError databaseError) {
 
           }
         });
 
-        if (!user_topic.isEmpty()) {
-          results_keys_ref.addValueEventListener(new ValueEventListener() {
+        if (!userLevel.isEmpty()) {
+          resultsKeysRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-              result_keys.clear();
+              resultKeys.clear();
               for (DataSnapshot results : dataSnapshot.getChildren()) {
                 Log.d(TAG + " results", String.valueOf(results.getKey()));
                 set_result_keys(results.getKey());
               }
 
-              Runnable runnable2 = new Runnable() {
-
-                @Override
-                public void run() {
-                  synchronized (this) {
-                    Show_Results(results_id);
-                    Log.d(TAG + " thread2", "Thread2 is called");
-                  }
-
-                }
+              Runnable runnable2 = ()-> {
+                Show_Results(resultsId);
+                Log.d(TAG + " thread2", "Thread2 is called");
               };
-
               Thread thread2 = new Thread(runnable2);
               thread2.start();
 
-
+              thread2.interrupt();
             }
 
             @Override
@@ -239,34 +192,25 @@ public class MainActivity extends AppCompatActivity {
             }
           });
         }
-
       }
-
       @Override
       public void onCancelled(DatabaseError databaseError) {
 
       }
     });
-
-    Log.d(TAG + "user_topic", get_Topic.getText().toString());
-
-
-
+    Log.d(TAG + "user_topic", getTopic.getText().toString());
   }
 
-
   public void Show_Results(int results_id) {
-
     id = get_results_key(results_id);
     Log.d(TAG, String.valueOf(results_id));
-
-    if (result_keys.size() > 0) {
+    if (resultKeys.size() > 0) {
       id = get_results_key(results_id);
-      Log.d(TAG + " out result_keys", String.valueOf(id));
-      results_keys_ref.child(id).child("Question").child("question").addValueEventListener(new ValueEventListener() {
+      Log.d(TAG + " out resultKeys", String.valueOf(id));
+      resultsKeysRef.child(id).child("Question").child("question").addValueEventListener(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-          title_result = getTitleQuestion(String.valueOf(dataSnapshot.getValue()));
+          titleResult = getTitleQuestion(String.valueOf(dataSnapshot.getValue()));
         }
 
         @Override
@@ -274,62 +218,76 @@ public class MainActivity extends AppCompatActivity {
 
         }
       });
-      results_keys_ref.child(id).child("Question").child("answers").addValueEventListener(new ValueEventListener() {
+      resultsKeysRef.child(id).child("Question").child("answers").addValueEventListener(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot choicesValue) {
 
           Log.d(TAG + " choicesValue", String.valueOf(choicesValue.getRef()));
-          users_results.clear();
-          for (DataSnapshot each_choice : choicesValue.getChildren()) {
+          usersResults.clear();
+          for (DataSnapshot eachChoice : choicesValue.getChildren()) {
             Log.d(TAG + " getChildren", String.valueOf(choicesValue.getChildrenCount()));
-            if (each_choice.getKey().equals("Choice1")) {
-              String[] choice_parts = String.valueOf(each_choice.getValue()).split("=");
+            if (eachChoice.getKey().equals("Choice1")) {
+              String[] choice_parts = String.valueOf(eachChoice.getValue()).split("=");
               choice_parts[0] = choice_parts[0].substring(1, choice_parts[0].length()); //key
               choice_parts[1] = choice_parts[1].substring(0, choice_parts[1].length() - 1); //counter
 
-              users_results.add(new PieEntry(Float.parseFloat(choice_parts[1]), choice_parts[0]));
+              usersResults.add(new PieEntry(Float.parseFloat(choice_parts[1]), choice_parts[0]));
               Log.d(TAG + " choice_parts0", choice_parts[0]);
               Log.d(TAG + " choice_parts1", choice_parts[1]);
-              Log.d(TAG + " Choice1", String.valueOf(each_choice.getValue()));
+              Log.d(TAG + " Choice1", String.valueOf(eachChoice.getValue()));
 
-            } else if (each_choice.getKey().equals("Choice2")) {
-              String[] choice_parts = String.valueOf(each_choice.getValue()).split("=");
+            } else if (eachChoice.getKey().equals("Choice2")) {
+              String[] choice_parts = String.valueOf(eachChoice.getValue()).split("=");
               choice_parts[0] = choice_parts[0].substring(1, choice_parts[0].length()); //key
               choice_parts[1] = choice_parts[1].substring(0, choice_parts[1].length() - 1); //counter
 
-              users_results.add(new PieEntry(Float.parseFloat(choice_parts[1]), choice_parts[0]));
-              Log.d(TAG + " Choice2", String.valueOf(each_choice.getValue()));
-            } else if (each_choice.getKey().equals("Choice3")) {
-              String[] choice_parts = String.valueOf(each_choice.getValue()).split("=");
+              usersResults.add(new PieEntry(Float.parseFloat(choice_parts[1]), choice_parts[0]));
+              Log.d(TAG + " Choice2", String.valueOf(eachChoice.getValue()));
+
+            } else if (eachChoice.getKey().equals("Choice3")) {
+              String[] choice_parts = String.valueOf(eachChoice.getValue()).split("=");
               choice_parts[0] = choice_parts[0].substring(1, choice_parts[0].length()); //key
               choice_parts[1] = choice_parts[1].substring(0, choice_parts[1].length() - 1); //counter
 
-              users_results.add(new PieEntry(Float.parseFloat(choice_parts[1]), choice_parts[0]));
-              Log.d(TAG + " Choice3", String.valueOf(each_choice.getValue()));
+              usersResults.add(new PieEntry(Float.parseFloat(choice_parts[1]), choice_parts[0]));
+              Log.d(TAG + " Choice3", String.valueOf(eachChoice.getValue()));
+
+            }else if (eachChoice.getKey().equals("Choice4")) {
+              String[] choice_parts = String.valueOf(eachChoice.getValue()).split("=");
+              choice_parts[0] = choice_parts[0].substring(1, choice_parts[0].length()); //key
+              choice_parts[1] = choice_parts[1].substring(0, choice_parts[1].length() - 1); //counter
+
+              usersResults.add(new PieEntry(Float.parseFloat(choice_parts[1]), choice_parts[0]));
+              Log.d(TAG + " Choice4", String.valueOf(eachChoice.getValue()));
+
+            }else if (eachChoice.getKey().equals("Choice5")) {
+              String[] choice_parts = String.valueOf(eachChoice.getValue()).split("=");
+              choice_parts[0] = choice_parts[0].substring(1, choice_parts[0].length()); //key
+              choice_parts[1] = choice_parts[1].substring(0, choice_parts[1].length() - 1); //counter
+
+              usersResults.add(new PieEntry(Float.parseFloat(choice_parts[1]), choice_parts[0]));
+              Log.d(TAG + " Choice5", String.valueOf(eachChoice.getValue()));
             }
           }
 
 
-          set = new PieDataSet(users_results, "");
+          set = new PieDataSet(usersResults, "");
           set.setColors(ColorTemplate.MATERIAL_COLORS);
 
           Description description = new Description();
-          description.setText(title_result);
+          description.setText(titleResult);
           description.setTextSize(15f);
 
-          Log.d(TAG + " size", String.valueOf(users_results.size()));
+          Log.d(TAG + " size", String.valueOf(usersResults.size()));
           Log.d(TAG + " id", id);
           Log.d(TAG + " set", set.toString());
-          results_PieChart.clear();
+          resultsPieChart.clear();
 
           data = new PieData(set);
-          results_PieChart.setData(data);
+          resultsPieChart.setData(data);
 
-          results_PieChart.setDescription(description);
-          results_PieChart.setDrawHoleEnabled(false);
-//                    results_PieChart.notifyDataSetChanged();
-//                    results_PieChart.invalidate();
-
+          resultsPieChart.setDescription(description);
+          resultsPieChart.setDrawHoleEnabled(false);
         }
 
         @Override
@@ -341,16 +299,16 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void set_result_keys(String key) {
-    result_keys.add(key);
+    resultKeys.add(key);
     id = get_results_key(0);
-    Log.d(TAG + " result_keys", String.valueOf(result_keys.size()));
-    Log.d(TAG + " result_keys", String.valueOf(id));
+    Log.d(TAG + " resultKeys", String.valueOf(resultKeys.size()));
+    Log.d(TAG + " resultKeys", String.valueOf(id));
   }
 
   public String get_results_key(int index) {
     Log.d(TAG + " get_results_key", String.valueOf(id));
-    if ((index >= 0 && index < result_keys.size()))
-      return result_keys.get(index);
+    if ((index >= 0 && index < resultKeys.size()))
+      return resultKeys.get(index);
     return "";
   }
 
@@ -370,6 +328,8 @@ public class MainActivity extends AppCompatActivity {
   protected void onResume() {
     super.onResume();
     Log.d(TAG, "onResume");
+
+
   }
 
   @Override
@@ -390,21 +350,20 @@ public class MainActivity extends AppCompatActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
 
     switch (item.getItemId()) {
-      case R.id.menu_item_topics:
+      case R.id.menu_item_levels:
         CreateTopicsDialog();
         break;
 
       case R.id.menu_item_check_topics:
         Intent intent = new Intent(MainActivity.this, PollsTopicActivity.class);
-        intent.putExtra("poll_topic", user_topic);
-        startActivity(intent);
+        intent.putExtra("poll_level", userLevel);
+        if(userLevel!=null)
+          startActivity(intent);
         break;
 
       case R.id.menu_item_signout:
         mAuth.signOut();
-        FirebaseMessaging.getInstance().unsubscribeFromTopic("Weather");
-        FirebaseMessaging.getInstance().unsubscribeFromTopic("Politics");
-        FirebaseMessaging.getInstance().unsubscribeFromTopic("Sports");
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(userLevel);
         startActivity(new Intent(this, LoginActivity.class));
         finish();
         break;
@@ -414,121 +373,101 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void CreateTopicsDialog() {
-    Topics_Dialog = new Dialog(MainActivity.this);
-    Topics_Dialog.setContentView(R.layout.topics_dialog);
-    Topics_Dialog.show();
 
-    weather_btn = (CheckBox) Topics_Dialog.findViewById(R.id.weather_checkBox);
-    politics_btn = (CheckBox) Topics_Dialog.findViewById(R.id.politics_checkBox);
-    sports_btn = (CheckBox) Topics_Dialog.findViewById(R.id.sports_checkBox);
+    TopicsDialog = new Dialog(MainActivity.this);
+    TopicsDialog.setContentView(R.layout.topics_dialog);
+    TopicsDialog.show();
 
-    boolean isChecked_weather = getBooleanFromPreferences("isChecked_weather");
-    boolean isChecked_politics = getBooleanFromPreferences("isChecked_politics");
-    boolean isChecked_sports = getBooleanFromPreferences("isChecked_sports");
+    studentBtn = (RadioButton) TopicsDialog.findViewById(R.id.student_radioBtn);
+    juniorBtn = (RadioButton) TopicsDialog.findViewById(R.id.junior_radioBtn);
+    seniorBtn = (RadioButton) TopicsDialog.findViewById(R.id.senior_radioBtn);
 
-    weather_btn.setChecked(isChecked_weather);
-    politics_btn.setChecked(isChecked_politics);
-    sports_btn.setChecked(isChecked_sports);
+    switch (userLevel){
+      case "Student":
+        studentBtn.setChecked(true);
+        break;
+      case "Junior":
+        juniorBtn.setChecked(true);
+        break;
+      case "Senior":
+        seniorBtn.setChecked(true);
+        break;
+    }
 
-    weather_btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-      @Override
-      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        Log.d(TAG + " onCheckedweather_btn", String.valueOf(isChecked));
-        MainActivity.this.putInPreferences(isChecked, String.valueOf(weather_btn.getText()), "isChecked_weather", "weather");
-        Topics_Dialog.dismiss();
-      }
-    });
-    politics_btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-      @Override
-      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        Log.d(TAG + " onCheckedpolitics_btn", String.valueOf(isChecked));
-        MainActivity.this.putInPreferences(isChecked, String.valueOf(politics_btn.getText()), "isChecked_politics", "politics");
-        Topics_Dialog.dismiss();
-      }
-    });
-    sports_btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-      @Override
-      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        Log.d(TAG + " onCheckedsports_btn", String.valueOf(isChecked));
-        MainActivity.this.putInPreferences(isChecked, String.valueOf(sports_btn.getText()), "isChecked_sports", "sports");
-        Topics_Dialog.dismiss();
-      }
-    });
-
-    btn_submit_topic = (Button) Topics_Dialog.findViewById(R.id.submit_topic);
-    btn_submit_topic.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Topics_Dialog.dismiss();
-      }
-    });
-
+    btnSubmitLevel = (Button) TopicsDialog.findViewById(R.id.submit_level);
+    btnSubmitLevel.setOnClickListener((v)->TopicsDialog.dismiss());
   }
 
   public void onTopicsSelected(View view) {
-    boolean checked = ((CheckBox) view).isChecked();
+    boolean checked = ((RadioButton) view).isChecked();
     // Check which checkbox was clicked
     switch (view.getId()) {
-      case R.id.weather_checkBox:
+      case R.id.student_radioBtn://TODO:na ftiaxo function
         if (checked) {
-          user_info.child("topic").setValue(weather_btn.getText());
-          user_topic = weather_btn.getText().toString();
-          results_PieChart.notifyDataSetChanged();
-          results_PieChart.invalidate();
-          weather_btn.setChecked(true);
-          FirebaseMessaging.getInstance().subscribeToTopic(weather_btn.getText().toString());
-          politics_btn.setChecked(false);
-          sports_btn.setChecked(false);
-          FirebaseMessaging.getInstance().unsubscribeFromTopic(politics_btn.getText().toString());
-          FirebaseMessaging.getInstance().unsubscribeFromTopic(sports_btn.getText().toString());
+          userInfo.child("level").setValue(studentBtn.getText());
+          userLevel = studentBtn.getText().toString();
+          resultsPieChart.notifyDataSetChanged();
+          resultsPieChart.invalidate();
+          studentBtn.setChecked(true);
+          FirebaseMessaging.getInstance().subscribeToTopic(studentBtn.getText().toString());
+          juniorBtn.setChecked(false);
+          seniorBtn.setChecked(false);
+          FirebaseMessaging.getInstance().unsubscribeFromTopic(juniorBtn.getText().toString());
+          FirebaseMessaging.getInstance().unsubscribeFromTopic(seniorBtn.getText().toString());
+        }else {
+          FirebaseMessaging.getInstance().unsubscribeFromTopic(studentBtn.getText().toString());
+
         }
         break;
-      case R.id.politics_checkBox:
-
+      case R.id.junior_radioBtn:
         if (checked) {
-          user_info.child("topic").setValue(politics_btn.getText());
-          user_topic = politics_btn.getText().toString();
-          results_PieChart.notifyDataSetChanged();
-          results_PieChart.invalidate();
-          politics_btn.setChecked(true);
-          FirebaseMessaging.getInstance().subscribeToTopic(politics_btn.getText().toString());
-          weather_btn.setChecked(false);
-          sports_btn.setChecked(false);
-          FirebaseMessaging.getInstance().unsubscribeFromTopic(sports_btn.getText().toString());
-          FirebaseMessaging.getInstance().unsubscribeFromTopic(weather_btn.getText().toString());
+          userInfo.child("level").setValue(juniorBtn.getText());
+          userLevel = juniorBtn.getText().toString();
+          resultsPieChart.notifyDataSetChanged();
+          resultsPieChart.invalidate();
+          juniorBtn.setChecked(true);
+          FirebaseMessaging.getInstance().subscribeToTopic(juniorBtn.getText().toString());
+          studentBtn.setChecked(false);
+          seniorBtn.setChecked(false);
+          FirebaseMessaging.getInstance().unsubscribeFromTopic(seniorBtn.getText().toString());
+          FirebaseMessaging.getInstance().unsubscribeFromTopic(studentBtn.getText().toString());
+        }else {
+          FirebaseMessaging.getInstance().unsubscribeFromTopic(juniorBtn.getText().toString());
+
         }
         break;
-      case R.id.sports_checkBox:
-
+      case R.id.senior_radioBtn:
         if (checked) {
-          user_info.child("topic").setValue(sports_btn.getText());
-          user_topic = sports_btn.getText().toString();
-          results_PieChart.notifyDataSetChanged();
-          results_PieChart.invalidate();
-          sports_btn.setChecked(true);
-          FirebaseMessaging.getInstance().subscribeToTopic(sports_btn.getText().toString());
-          politics_btn.setChecked(false);
-          weather_btn.setChecked(false);
-          FirebaseMessaging.getInstance().unsubscribeFromTopic(politics_btn.getText().toString());
-          FirebaseMessaging.getInstance().unsubscribeFromTopic(weather_btn.getText().toString());
+          userInfo.child("level").setValue(seniorBtn.getText());
+          userLevel = seniorBtn.getText().toString();
+          resultsPieChart.notifyDataSetChanged();
+          resultsPieChart.invalidate();
+          seniorBtn.setChecked(true);
+          FirebaseMessaging.getInstance().subscribeToTopic(seniorBtn.getText().toString());
+          juniorBtn.setChecked(false);
+          studentBtn.setChecked(false);
+          FirebaseMessaging.getInstance().unsubscribeFromTopic(juniorBtn.getText().toString());
+          FirebaseMessaging.getInstance().unsubscribeFromTopic(studentBtn.getText().toString());
+        }else {
+          FirebaseMessaging.getInstance().unsubscribeFromTopic(seniorBtn.getText().toString());
+
         }
         break;
     }
   }
 
-  public void putInPreferences(boolean isChecked, String CheckedValue, String Booleankey, String Stringkey) {
-    SharedPreferences sharedPreferences = this.getPreferences(Activity.MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putBoolean(Booleankey, isChecked);
-    editor.putString(Stringkey, CheckedValue);
-    editor.apply();
-  }
-
-  public boolean getBooleanFromPreferences(String key) {
-    SharedPreferences sharedPreferences = this.getPreferences(Activity.MODE_PRIVATE);
-    Boolean isChecked = sharedPreferences.getBoolean(key, false);
-    return isChecked;
-  }
+//  public void putInPreferences(boolean isChecked, String Booleankey) {
+//    SharedPreferences sharedPreferences = this.getPreferences(Activity.MODE_PRIVATE);
+//    SharedPreferences.Editor editor = sharedPreferences.edit();
+//    editor.putBoolean(Booleankey, isChecked);
+//    editor.apply();
+//  }
+//
+//  public boolean getBooleanFromPreferences(String key) {
+//    SharedPreferences sharedPreferences = this.getPreferences(Activity.MODE_PRIVATE);
+//    Boolean isChecked = sharedPreferences.getBoolean(key, false);
+//    return isChecked;
+//  }
 
 //    public String getStringFromPreferences(String key){
 //        SharedPreferences sharedPreferences = this.getPreferences(Activity.MODE_PRIVATE);

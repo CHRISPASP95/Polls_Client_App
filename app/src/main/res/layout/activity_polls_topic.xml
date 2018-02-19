@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.christospaspalieris.polls_client_app.PollsTopicActivity">
+    tools:context="com.example.christospaspalieris.polls_client_app.PollsTopicActivity"
+    android:background="@drawable/gradiant">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/poll_list"

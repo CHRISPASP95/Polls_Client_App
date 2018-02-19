@@ -14,6 +14,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="topicString">Topics:</string>
+    <string name="topicString">Level:</string>
     <string name="SignOut">Sign Out</string>
+    <string name="NoPoll">No Polls Available</string>
 </resources>
