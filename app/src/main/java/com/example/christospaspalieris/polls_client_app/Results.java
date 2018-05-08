@@ -16,6 +16,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.List;
 
 public class Results {
+
   private List<String> resultKeys;
   private String id, titleResult;
   private DatabaseReference resultsKeysRef;

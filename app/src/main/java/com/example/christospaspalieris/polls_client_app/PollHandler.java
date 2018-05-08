@@ -13,12 +13,12 @@ import java.util.Map;
 
 public class PollHandler {
 
-    DatabaseReference user_keys;
-    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference user_keys;
+    private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-    String title;
-    Map<String,Object> keys;
-    Map<String,Object> AnsweredKeys;
+    private String title;
+    private Map<String,Object> keys;
+    private Map<String,Object> AnsweredKeys;
 
     public PollHandler() {
     }
