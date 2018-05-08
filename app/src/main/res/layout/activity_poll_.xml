@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     tools:context="com.example.christospaspalieris.polls_client_app.Poll_Activity"
     android:background="@drawable/gradiant">
 
@@ -19,7 +19,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="textStart"
-            android:textSize="18sp" />
+            android:textColor="#d9e5f3"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <RadioGroup
             android:id="@+id/radiogroup1"
@@ -32,16 +34,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:onClick="RadioButtons_Selected"
                 android:textColor="#d9e5f3"
-                android:onClick="RadioButtons_Selected" />
+                android:textSize="18sp" />
 
             <RadioButton
                 android:id="@+id/btn2_question1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:onClick="RadioButtons_Selected"
                 android:textColor="#d9e5f3"
-                android:onClick="RadioButtons_Selected" />
+                android:textSize="18sp" />
 
             <RadioButton
                 android:id="@+id/btn3_question1"
@@ -49,8 +53,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="RadioButtons_Selected"
-                android:textSize="14sp"
                 android:textColor="#d9e5f3"
+                android:textSize="18sp"
                 android:visibility="gone" />
 
             <RadioButton
@@ -58,8 +62,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="#d9e5f3"
                 android:onClick="RadioButtons_Selected"
+                android:textColor="#d9e5f3"
+                android:textSize="18sp"
                 android:visibility="gone" />
 
             <RadioButton
@@ -67,9 +72,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="#d9e5f3"
                 android:onClick="RadioButtons_Selected"
-                android:textSize="14sp"
+                android:textColor="#d9e5f3"
+                android:textSize="18sp"
                 android:visibility="gone" />
         </RadioGroup>
 

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -35,7 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         buttonRegister=(Button)findViewById(R.id.buttonRegister);
         editTextUserName = (EditText)findViewById(R.id.editTextUserName);
         editTextFirstName = (EditText)findViewById(R.id.editTextFirstName);
@@ -56,6 +57,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        startActivity(new Intent(this,LoginActivity.class));
 
     }
 
@@ -128,18 +132,19 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Please enter your age", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(!male.isChecked() && !female.isChecked()){
+        if(!(male.isChecked() || female.isChecked())){
             Toast.makeText(getApplicationContext(),"Please enter your gender", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if(!student.isChecked() && !junior.isChecked() && !senior.isChecked()){
+        if(!(student.isChecked() || junior.isChecked() || senior.isChecked())){
             Toast.makeText(getApplicationContext(),"Please choose your level", Toast.LENGTH_SHORT).show();
             return;
         }
 
         mProgress.setMessage("Registering User and\nSigning In");
         mProgress.show();
+
 
         mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener((task)-> {
             if(task.isSuccessful()){
@@ -149,9 +154,10 @@ public class RegisterActivity extends AppCompatActivity {
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 mainIntent.putExtra("User_Level",level);
                 startActivity(mainIntent);
+                this.finish();
             }
             else {
-                Toast.makeText(getApplicationContext(),"Error while login", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Error while login ", Toast.LENGTH_SHORT).show();
                 mProgress.dismiss();
             }
         });

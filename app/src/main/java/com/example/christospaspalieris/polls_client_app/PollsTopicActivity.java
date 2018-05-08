@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -27,7 +26,7 @@ import java.util.Map;
 public class PollsTopicActivity extends AppCompatActivity {
 
   static String TAG = "PollsTopicActivity";
-  public String userId = "", Level = "", getUser = "", getTappedQuestion;
+  public String userId = "", Level = "", QuestionKey = "", getTappedQuestion;
   private RecyclerView userQuestionsList;
   DatabaseReference userPolls, pollsRef, dbRef;
   Context mContext;
@@ -36,17 +35,12 @@ public class PollsTopicActivity extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
-
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    if (item.getItemId() == android.R.id.home) {
-      Intent intent = new Intent(this, MainActivity.class);
-      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-      startActivity(intent);
-    }
-    return super.onOptionsItemSelected(item);
+    super.onBackPressed();
+    Intent intent = new Intent(this, MainActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    intent.putExtra("User_Level",Level);
+    startActivity(intent);
+    this.finish();
   }
 
   @Override
@@ -64,11 +58,6 @@ public class PollsTopicActivity extends AppCompatActivity {
     setContentView(R.layout.activity_polls_topic);
     mContext = PollsTopicActivity.this;
 
-    if (getSupportActionBar() != null) {
-      getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-      getSupportActionBar().setDisplayShowHomeEnabled(true);
-    }
-
     userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     Bundle bundle = getIntent().getExtras();
@@ -77,15 +66,13 @@ public class PollsTopicActivity extends AppCompatActivity {
       Log.d(TAG + "TOPIC", Level);
       pollHandler = new PollHandler(Level);
       userPolls = FirebaseDatabase.getInstance().getReference("USERS").child(userId).child(Level).child("UnAnswered");
-      pollsRef = FirebaseDatabase.getInstance().getReference("polls");
     }
-
+    pollsRef = FirebaseDatabase.getInstance().getReference("polls");
     userQuestionsList = (RecyclerView) findViewById(R.id.poll_list);
     userQuestionsList.setHasFixedSize(true);
     userQuestionsList.setLayoutManager(new LinearLayoutManager(mContext));
 
     Log.d(TAG + "USERID", userId);
-
     Runnable runnable = () -> {
 
       if (userPolls != null) {
@@ -97,10 +84,10 @@ public class PollsTopicActivity extends AppCompatActivity {
         ) {
           @Override
           protected void populateViewHolder(final QuestionViewHolder viewHolder, final String model, int position) {
-            getUser = getRef(position).getKey();
-            Log.d(TAG + "getUser", getUser);
+            QuestionKey = getRef(position).getKey();
+            Log.d(TAG + "getUser", QuestionKey);
             Log.d(TAG + "userPolls.getRef()", String.valueOf(userPolls.getRef()));
-            pollsRef.child(Level).child(getUser).child("Question").addValueEventListener(new ValueEventListener() {
+            pollsRef.child(Level).child(QuestionKey).child("Question").addValueEventListener(new ValueEventListener() {
               @Override
               public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d(TAG, String.valueOf(dataSnapshot.getRef()));
@@ -127,7 +114,6 @@ public class PollsTopicActivity extends AppCompatActivity {
               mBundle.putString("poll_level", Level);
               mBundle.putString("getTappedQuestion", getTappedQuestion);
               poll_activity.putExtras(mBundle);
-              poll_activity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
               startActivity(poll_activity);
             });
           }

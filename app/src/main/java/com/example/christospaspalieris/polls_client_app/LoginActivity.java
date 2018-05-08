@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,22 +32,6 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog progressLogin;
     private FirebaseUser user;
     private CheckConnectivity checkConnectivity;
-
-//    Handler startProgressBar = new Handler(Looper.getMainLooper()){
-//        @Override
-//        public void handleMessage(Message msg) {
-//            progressLogin.setMessage("Signing In");
-//            progressLogin.show();
-//        }
-//    };
-//
-//    Handler stopProgressBar = new Handler(Looper.getMainLooper()){
-//        @Override
-//        public void handleMessage(Message msg) {
-//            progressLogin.dismiss();
-//        }
-//    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         else {
             setContentView(R.layout.activity_login);
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
             mAuth = FirebaseAuth.getInstance();
             user = mAuth.getCurrentUser();
             dbReferenceUsers = FirebaseDatabase.getInstance().getReference("USERS");
@@ -65,7 +51,8 @@ public class LoginActivity extends AppCompatActivity {
             editPass = (EditText) findViewById(R.id.editPassword);
             btn_sign_in = (Button) findViewById(R.id.signin);
             btn_sign_up = (TextView) findViewById(R.id.signup);
-            btn_sign_up.setOnClickListener((v)-> startActivity(new Intent(getApplicationContext(),RegisterActivity.class)));
+            Intent register = new Intent(getApplicationContext(),RegisterActivity.class);
+            btn_sign_up.setOnClickListener((v)-> startActivity(register));
             btn_sign_in.setOnClickListener((v)-> {
                 progressLogin.setMessage("Signing In");
                 SignIn();
@@ -98,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if(!TextUtils.isEmpty(getemail)&&!TextUtils.isEmpty(getpassword)) {
             mAuth.signInWithEmailAndPassword(getemail, getpassword)
-                .addOnCompleteListener(this, (task)-> {
+                .addOnCompleteListener((task)-> {
                     if (task.isSuccessful()) {
                         checkUserExist();
                         progressLogin.dismiss();
@@ -129,14 +116,6 @@ public class LoginActivity extends AppCompatActivity {
         progressLogin.dismiss();
         finish();
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-
-
 
     public void checkUserExist() {
         final String user_id = mAuth.getCurrentUser().getUid();

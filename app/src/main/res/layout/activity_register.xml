@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     tools:context="com.example.christospaspalieris.polls_client_app.RegisterActivity"
     android:background="@drawable/gradiant">
 
@@ -31,93 +31,85 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20sp">
+                android:orientation="vertical">
 
                 <EditText
                     android:id="@+id/editTextUserName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="username"
-                    android:textColorHint="#d9e5f3"
-                    android:layout_marginStart="15dp"
-                    android:background="#00000000"
-                    android:letterSpacing="0.1"
-                    android:textSize="16sp"
+
+                    android:hint="Username"
                     android:inputType="text"
-                    android:textColor="#fff"
+                    android:letterSpacing="0.1"
                     android:padding="10sp"
-                    />
+                    android:textColor="#fff"
+                    android:textColorHint="#d9e5f3"
+                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/editTextFirstName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+
                     android:hint="Enter your first name"
-                    android:textColorHint="#d9e5f3"
-                    android:layout_marginStart="15dp"
-                    android:background="#00000000"
-                    android:letterSpacing="0.1"
-                    android:textSize="16sp"
                     android:inputType="text"
+                    android:letterSpacing="0.1"
+                    android:padding="10sp"
                     android:textColor="#fff"
-                    android:padding="10sp"/>
+                    android:textColorHint="#d9e5f3"
+                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/editTextLastName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+
                     android:hint="Enter your last name"
-                    android:textColorHint="#d9e5f3"
-                    android:layout_marginStart="15dp"
-                    android:background="#00000000"
-                    android:letterSpacing="0.1"
-                    android:textSize="16sp"
                     android:inputType="text"
+                    android:letterSpacing="0.1"
+                    android:padding="10sp"
                     android:textColor="#fff"
-                    android:padding="10sp"/>
+                    android:textColorHint="#d9e5f3"
+                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/editTextEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+
                     android:hint="Enter your email"
-                    android:textColorHint="#d9e5f3"
-                    android:layout_marginLeft="15dp"
-                    android:background="#00000000"
-                    android:letterSpacing="0.1"
-                    android:textSize="16sp"
                     android:inputType="textEmailAddress"
+                    android:letterSpacing="0.1"
+                    android:padding="10sp"
                     android:textColor="#fff"
-                    android:padding="10sp"/>
+                    android:textColorHint="#d9e5f3"
+                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/editTextPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+
                     android:hint="Enter your password"
-                    android:textColorHint="#d9e5f3"
-                    android:layout_marginStart="15dp"
-                    android:background="#00000000"
-                    android:letterSpacing="0.1"
-                    android:textSize="16sp"
                     android:inputType="textPassword"
+                    android:letterSpacing="0.1"
+                    android:padding="10sp"
                     android:textColor="#fff"
-                    android:padding="10sp"/>
+                    android:textColorHint="#d9e5f3"
+                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/editAge"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Age"
-                    android:textColorHint="#d9e5f3"
-                    android:layout_marginStart="15dp"
-                    android:background="#00000000"
+
+                    android:hint="Enter your Age"
+                    android:inputType="number"
                     android:letterSpacing="0.1"
-                    android:textSize="16sp"
-                    android:inputType="text"
+                    android:padding="10sp"
                     android:textColor="#fff"
-                    android:padding="10sp"/>
+                    android:textColorHint="#d9e5f3"
+                    android:textSize="16sp" />
 
             </LinearLayout>
 

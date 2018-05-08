@@ -66,20 +66,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notifyUser(title, message, click_action);
         }
 
-        // Check if message contains a notification payload.
-//        if (remoteMessage.getNotification() != null) {
-//            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-//            String title = remoteMessage.getNotification().getTitle();
-//            String message = remoteMessage.getNotification().getBody();
-//            String click_action = remoteMessage.getNotification().getClickAction();
-//            get_collapse = remoteMessage.getCollapseKey();
-//            Log.d(TAG, "Message action: " + click_action);
-//
-//
-//
-//            notifyUser(title, message, click_action);
-//        }
-
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
@@ -90,8 +76,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         super.onDeletedMessages();
 
     }
-
-
 
     public void notifyUser(String title, String notification, String click_action){
         Intent intent;
@@ -111,4 +95,5 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         MyNotificationManager myNotificationManager = new MyNotificationManager(getApplicationContext());
         myNotificationManager.showNotification(title, notification,intent);
     }
+
 }

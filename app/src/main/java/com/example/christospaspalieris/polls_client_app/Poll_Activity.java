@@ -20,8 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Poll_Activity extends AppCompatActivity {
 
-  DatabaseReference Poll_Ref;
-  DatabaseReference Results_Poll_Ref;
+  DatabaseReference Poll_Ref, Results_Poll_Ref;
   String POLL_KEY = "", Level = "";
   int counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0;
   ProgressBar data;
@@ -32,13 +31,15 @@ public class Poll_Activity extends AppCompatActivity {
   private static String TAG = "Poll_Activity";
 
 
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_poll_);
     Poll_Ref = FirebaseDatabase.getInstance().getReference("polls");
-    Results_Poll_Ref = FirebaseDatabase.getInstance().getReference("Results");  q1 = (TextView) findViewById(R.id.question_1);
+    Results_Poll_Ref = FirebaseDatabase.getInstance().getReference("Results");
     Btn_Submit = (Button) findViewById(R.id.submit_result);
+    q1 = (TextView) findViewById(R.id.question_1);
     rb1_q1 = (RadioButton) findViewById(R.id.btn1_question1);
     rb2_q1 = (RadioButton) findViewById(R.id.btn2_question1);
     rb3_q1 = (RadioButton) findViewById(R.id.btn3_question1);
@@ -55,7 +56,7 @@ public class Poll_Activity extends AppCompatActivity {
       Log.d(TAG + "POLL_KEY", Level);
     }
 
-    Poll_Ref.child(Level).child(POLL_KEY).child("Question").addValueEventListener(new ValueEventListener() {
+    Poll_Ref.child(Level).child(POLL_KEY).child("Question").addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
         q1.setText(String.valueOf(dataSnapshot.getValue()));
@@ -67,7 +68,7 @@ public class Poll_Activity extends AppCompatActivity {
       }
     });
 
-    Poll_Ref.child(Level).child(POLL_KEY).child("Choices").addValueEventListener(new ValueEventListener() {
+    Poll_Ref.child(Level).child(POLL_KEY).child("Choices").addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
        for(DataSnapshot d : dataSnapshot.getChildren()){
@@ -83,12 +84,15 @@ public class Poll_Activity extends AppCompatActivity {
 
 
 
-    Btn_Submit.setOnClickListener(v ->finish());
+    Btn_Submit.setOnClickListener(v ->{
+     // startActivity(goBack);//TODO:allagi
+      finish();
+    });
   }
 
   private void ShowQuestion(String key) {
     if(key.equals("Choice1")){
-      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice1").addValueEventListener(new ValueEventListener() {
+      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice1").addListenerForSingleValueEvent(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
           Log.d(TAG + "Choice1", dataSnapshot.getKey());
@@ -104,7 +108,7 @@ public class Poll_Activity extends AppCompatActivity {
       });
     }
     if(key.equals("Choice2")){
-      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice2").addValueEventListener(new ValueEventListener() {
+      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice2").addListenerForSingleValueEvent(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
           Log.d(TAG + "Choice2", dataSnapshot.getKey());
@@ -121,7 +125,7 @@ public class Poll_Activity extends AppCompatActivity {
     }
     if(key.equals("Choice3")){
       rb3_q1.setVisibility(View.VISIBLE);
-      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice3").addValueEventListener(new ValueEventListener() {
+      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice3").addListenerForSingleValueEvent(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
           Log.d(TAG + "Choice3", dataSnapshot.getKey());
@@ -138,7 +142,7 @@ public class Poll_Activity extends AppCompatActivity {
     }
     if(key.equals("Choice4")){
       rb4_q1.setVisibility(View.VISIBLE);
-      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice4").addValueEventListener(new ValueEventListener() {
+      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice4").addListenerForSingleValueEvent(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
           Log.d(TAG + "Choice4", dataSnapshot.getKey());
@@ -155,7 +159,7 @@ public class Poll_Activity extends AppCompatActivity {
     }
     if(key.equals("Choice5")){
       rb5_q1.setVisibility(View.VISIBLE);
-      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice5").addValueEventListener(new ValueEventListener() {
+      Poll_Ref.child(Level).child(POLL_KEY).child("Choices").child("Choice5").addListenerForSingleValueEvent(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
           Log.d(TAG + "Choice5", dataSnapshot.getKey());
@@ -185,7 +189,6 @@ public class Poll_Activity extends AppCompatActivity {
   private void SaveResults(boolean checked, int id) {
     if(id == R.id.btn1_question1 || id == R.id.btn2_question1 || id == R.id.btn3_question1 || id == R.id.btn4_question1 || id == R.id.btn5_question1)
       Results_Poll_Ref.child(Level).child(POLL_KEY).child("Question").child("question").setValue(q1.getText().toString());
-
     switch (id) {
       case R.id.btn1_question1:
         if (checked) {
